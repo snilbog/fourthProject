@@ -15,7 +15,6 @@ InfiniteScroller.Game.prototype = {
     this.player = this.game.add.sprite(this.game.width/2, this.game.height-500, 'man');
     this.player.animations.add('walk', [4, 5, 6, 7], 10, true);
     this.player.animations.add('playerFall' [0, 4, 8, 12], 10, true);
-
     this.game.world.bringToTop(this.ground);
     this.game.world.bringToTop(this.grass);
     this.game.physics.arcade.enable(this.player);
@@ -32,6 +31,7 @@ InfiniteScroller.Game.prototype = {
     this.player.fallDimensions = {width: playerFallImg.width, height: playerFallImg.height};
     this.player.standDimensions = {width: this.player.width, height: this.player.height};
     this.player.anchor.setTo(0.5, 1);
+    this.player.body.collideWorldBounds = true;
     
     this.player.animations.play('walk');
     
@@ -43,6 +43,7 @@ InfiniteScroller.Game.prototype = {
     this.soundTrack.play();
     this.jumpTrack = this.game.add.audio('jump', 1, false);
     this.hurtTrack = this.game.add.audio('hurt', 1, false);
+    this.burgerTrack = this.game.add.audio('burger', 1, false);
     this.gameOverTrack = this.game.add.audio('gameOver', 1, false);
 
     this.tackles = 5;
@@ -51,15 +52,6 @@ InfiniteScroller.Game.prototype = {
     this.wrapping = true;
     this.stopped = false;
     this.maxfalls = 5;
-    
-    //create an array of possible toys that can be gathered from toy mounds
-    // var bottle = this.game.add.sprite(0, this.game.height-100, 'bottle');
-    // var ball = this.game.add.sprite(0, this.game.height-100, 'ball');
-    // bottle.visible = false;
-    // ball.visible = false;
-    // this.toys = [bottle, ball];
-    // this.currentToy = bottle;
-    
   
     var style1 = { font: "20px Arial", fill: "#ff0"};
     var t1 = this.game.add.text(10, 20, "Points:", style1);
@@ -75,10 +67,11 @@ InfiniteScroller.Game.prototype = {
     this.generateBlock();
     this.generateEnemies();
     this.generateZombies();
+    this.generateBurgers();
     this.game.time.events.loop(Phaser.Timer.SECOND * 2, this.releaseEnemies, this);
     this.game.time.events.loop(Phaser.Timer.SECOND * 3, this.releaseZombies, this);
     this.game.time.events.loop(Phaser.Timer.SECOND * 1.8, this.releaseBlock, this);
-
+    this.game.time.events.loop(Phaser.Timer.SECOND * 4, this.releaseBurger, this);
   },
   
   update: function() {
@@ -91,7 +84,9 @@ InfiniteScroller.Game.prototype = {
     this.game.physics.arcade.collide(this.player, this.ground);
     this.game.physics.arcade.collide(this.player, this.enemies, this.enemyHit, null, this);
     this.game.physics.arcade.collide(this.player, this.zombies, this.zombieHit, null, this);
-    this.game.physics.arcade.collide(this.player, this.blocks)
+    this.game.physics.arcade.collide(this.player, this.blocks);
+    this.game.physics.arcade.collide(this.player, this.burgers, this.burgerHit, null, this);
+
     if(this.player.alive && !this.stopped) {
       
        if(!this.wrapping && this.player.x < this.game.width) {
@@ -102,6 +97,7 @@ InfiniteScroller.Game.prototype = {
         
         this.enemies.destroy();
         this.zombies.destroy();
+        this.burgers.destroy();
         
         this.game.world.bringToTop(this.grass);
         this.game.world.bringToTop(this.ground);
@@ -112,6 +108,12 @@ InfiniteScroller.Game.prototype = {
       
       if (this.swipe.isDown && (this.swipe.positionDown.y > this.swipe.position.y)) {
         this.playerJump();
+      }
+      if (this.cursors.left.isDown) {
+      this.player.body.velocity.x = -200;
+      } 
+      else if (this.cursors.right.isDown) {
+      this.player.body.velocity.x = 200;
       }
       else if (this.cursors.up.isDown) {
         this.playerJump();
@@ -157,6 +159,16 @@ InfiniteScroller.Game.prototype = {
     this.player.body.velocity.x = 0;
     this.game.time.events.add(Phaser.Timer.SECOND * 0.5, this.playerFall, this);
   },
+
+  burgerHit: function(player, burger) {
+    burger.destroy();
+
+    this.points+= 1000;
+    this.tackles++;
+    this.refreshStats();
+    
+    this.burgerTrack.play();
+    },
   
   gameOver: function() {
     this.game.state.start('Title');
@@ -166,7 +178,7 @@ InfiniteScroller.Game.prototype = {
     if(this.player.body.touching.down) {
       this.points+= 100;
       this.refreshStats();
-      this.player.body.velocity.y -= 700;
+      this.player.body.velocity.y -= 800;
       this.jumpTrack.play();
     }    
   },
@@ -185,6 +197,7 @@ InfiniteScroller.Game.prototype = {
       this.player.animations.play('walk');
       this.player.scale.x = -3;
       this.player.body.velocity.x = -500;
+      this.player.body.collideWorldBounds = false;
 
       this.game.time.events.add(2500, this.gameOver, this);
     } else {
@@ -198,7 +211,7 @@ InfiniteScroller.Game.prototype = {
     enemy.outOfBoundsKill = true;
     enemy.scale.setTo(-0.5, 0.5);
     console.log(enemy.body.width, enemy.body.height);
-    enemy.reset(this.game.world.width, this.game.height-110);
+    enemy.reset(this.game.world.width, this.game.height-240);
     enemy.body.velocity.x = this.game.rnd.integerInRange(-900, -450);
   },
  
@@ -206,7 +219,7 @@ InfiniteScroller.Game.prototype = {
     this.enemies = this.game.add.group();
     this.enemies.enableBody = true;
     this.enemies.physicsBodyType = Phaser.Physics.ARCADE;
-    this.enemies.createMultiple(10, 'enemy');
+    this.enemies.createMultiple(40, 'enemy');
     this.enemies.setAll('anchor.x', 0.5);
     this.enemies.setAll('anchor.y', 0.5);
     this.enemies.callAll('body.setSize', 'body', 45, 50, 0, 0);
@@ -228,7 +241,7 @@ InfiniteScroller.Game.prototype = {
     this.zombies = this.game.add.group();
     this.zombies.enableBody = true;
     this.zombies.physicsBodyType = Phaser.Physics.ARCADE;
-    this.zombies.createMultiple(10, 'zombie');
+    this.zombies.createMultiple(30, 'zombie');
     this.zombies.setAll('anchor.x', 0.5);
     this.zombies.setAll('anchor.y', 0.5);
     this.zombies.callAll('body.setSize', 'body', 20, 60, 0, 0);
@@ -241,27 +254,39 @@ InfiniteScroller.Game.prototype = {
     block.outOfBoundsKill = true;
     block.body.immovable = true;
     block.scale.setTo(1);
-    block.reset(this.game.world.width, this.game.height-100);
-    block.body.velocity.x = this.game.rnd.integerInRange(-300, -100);
+    block.reset(this.game.world.width, this.game.height-130);
+    block.body.velocity.x = this.game.rnd.integerInRange(-300, -200);
   },
 
   generateBlock: function() {
     this.blocks = this.game.add.group();
     this.blocks.enableBody = true;
     this.blocks.physicsBodyType = Phaser.Physics.ARCADE
-    this.blocks.createMultiple(5, 'block');
+    this.blocks.createMultiple(30, 'block');
     this.blocks.setAll('anchor.x', 0.5);
     this.blocks.setAll('anchor.y', 0.5);
     this.blocks.callAll('body.setSize', 'body', 96, 33, 0, 0);
   },
     
-  //   var block = platforms.create(400, 400, 'block');
-  //   block.body.immovable = true;
-  //   ledge = platforms.create(-150, 250, 'block');
-  //   block.body.immovable = true;
-  //   this.game.camera.follow(this.player);
-  //   this.block = this.add.tileSprite(0,this.game.world.height-15,this.game.world.width,5,'block');
+    releaseBurger: function() {
+    var burger = this.burgers.getFirstExists(false);
+    burger.checkWorldBounds = true;
+    burger.outOfBoundsKill = true;
+    burger.body.immovable = true;
+    burger.scale.setTo(1);
+    burger.reset(0, this.game.height-290);
+    burger.body.velocity.x = this.game.rnd.integerInRange(200, 100);
+  },
 
+  generateBurgers: function() {
+    this.burgers = this.game.add.group();
+    this.burgers.enableBody = true;
+    this.burgers.physicsBodyType = Phaser.Physics.ARCADE
+    this.burgers.createMultiple(50, 'burger');
+    this.burgers.setAll('anchor.x', 0.5);
+    this.burgers.setAll('anchor.y', 0.5);
+    this.burgers.callAll('body.setSize', 'body', 32, 32, 0, 0);
+  },
 
   render: function(){
          // for (var i = 0; i < this.enemies.children.length; i++) {

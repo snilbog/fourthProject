@@ -19,8 +19,7 @@ InfiniteScroller.Preload.prototype = {
     this.load.image('grass', 'assets/images/grass.png');
     this.load.image('enemy', 'assets/images/enemy.png');
     this.load.image('block', 'assets/images/block.png');
-    this.load.image('bottle', 'assets/images/toys/bottle.png');
-    this.load.image('ball', 'assets/images/toys/soccerBall.png');
+    this.load.image('burger', 'assets/images/burger.png');
     
     this.load.spritesheet('zombie', 'assets/images/zombie.png', 46.4, 60);
     this.load.spritesheet('man', 'assets/images/man_walk.png', 16, 24);
@@ -29,6 +28,7 @@ InfiniteScroller.Preload.prototype = {
     this.load.audio('main', 'assets/audio/main.mp3');
     this.load.audio('jump', 'assets/audio/jump.mp3');
     this.load.audio('hurt', 'assets/audio/hurt.mp3');
+    this.load.audio('burger', 'assets/audio/burger.mp3');
     this.load.audio('gameOver', 'assets/audio/gameOver.mp3');
   },
   
