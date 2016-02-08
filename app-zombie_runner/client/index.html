@@ -12,12 +12,12 @@
     </style>
 </head>
  
-<body>
+<body>  
+  <div id="game">{{> game}} </div>
   <div id="outer">
     <h1>Leaderboard</h1>
     {{> leaderboard }}
-    {{> addPlayer}}
-    {{> game}} </div>
+  </div>
 </body>
 
 <template name="game">	{{game}}</template>
@@ -36,31 +36,13 @@
   </div>
   {{/if}}
 
-  {{#unless selected_name}}
-  <div class="none">Click a player to select</div>
-  {{/unless}}
-
-  <div>
-      <input type="button" class="sort" value="Change sorting" />
-  </div>
 </template>
 
 <template name="player">
   <div class="player {{selected}}">
-    <span class="name">{{name}}</span>
+    <span class="name">{{initials}}</span>
     <span class="score">{{score}}</span>
   </div>
-</template>
-
-<template name="addPlayer">
-    <div>
-        <div>Add a new player:</div>
-        <span class="name">Name:</span>
-        <input type="text" id="playerName" />
-        <span class="score">Score:</span>
-        <input type="text" id="playerScore" />
-        <input type="button" class="add" value="Add player" />
-    </div>
 </template>
 
 

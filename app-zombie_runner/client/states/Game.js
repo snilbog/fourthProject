@@ -174,6 +174,15 @@ Game.prototype = {
     },
   
   gameOver: function() {
+    var initials = prompt('Enter your initials!');
+    var score = this.points;
+    var obj = {
+      initials: initials,
+      score: score
+    }
+
+    Players.insert(obj);
+
     this.game.state.start('Title');
   },
  
