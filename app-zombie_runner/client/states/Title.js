@@ -16,7 +16,7 @@ Title.prototype = {
     this.introTrack.play(); 
   
   var pretitle = this.game.add.text(this.game.world.width / 2, this.game.world.height / 2, 'Jamuel L. Sackson\n Presents', {font: '15px Arial', fill: '#000000', align: 'top'});  
-  var title = this.game.add.text(this.game.world.width / 2, this.game.world.height / 2, 'Low Pulp NonFiction!', { font: '35px Arial', fill: '#ff3333', align: 'center' });
+  var title = this.game.add.text(this.game.world.width / 2, this.game.world.height / 2, 'Pulp Fiction + Zombies!', { font: '35px Arial', fill: '#ff3333', align: 'center' });
   var score = this.game.add.text(this.game.world.width / 2, this.game.world.height / 2, 'Original Score\n by\n Hero', { font: '15px Arial', fill: '#000000', align: 'center' });
     pretitle.anchor.setTo(0.5, 1.9);
     title.anchor.setTo(0.5, 0.5);

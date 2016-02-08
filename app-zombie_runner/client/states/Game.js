@@ -9,7 +9,7 @@ Game.prototype = {
   create: function() {
 
     this.background = this.game.add.tileSprite(0, 0, 1024, 1024, 'background');
-    this.background.scale.setTo(1, 0.3);
+    this.background.scale.setTo(1, 0.4);
     this.ground = this.add.tileSprite(0,this.game.world.height-10, this.game.world.width, 10, 'ground');
     this.grass = this.add.tileSprite(0,this.game.world.height-15,this.game.world.width,5,'grass');
     this.player = this.game.add.sprite(this.game.width/2, this.game.height-200, 'man');
@@ -21,7 +21,7 @@ Game.prototype = {
     this.game.physics.arcade.enable(this.ground);
     this.player.body.gravity.y = 1700;
     this.player.scale.setTo(0.7);
-    this.player.body.setSize(100, 110, 0, 0);
+    this.player.body.setSize(100, 130, 0, 0);
     //this.player.body.immovable = true;
     this.ground.body.immovable = true;
     this.ground.body.allowGravity = false;
@@ -39,12 +39,12 @@ Game.prototype = {
     this.swipe = this.game.input.activePointer;
 
     this.soundTrack = this.game.add.audio('main', .7, true);
-    this.soundTrack.play();
     this.jumpTrack = this.game.add.audio('jump', 1, false);
     this.hurtTrack = this.game.add.audio('hurt', 1, false);
     this.burgerTrack = this.game.add.audio('burger', 1, false);
     this.gameOverTrack = this.game.add.audio('gameOver', 1, false);
-
+    this.soundTrack.play();
+    
     this.tackles = 5;
     this.wraps = 0;
     this.points = 0;
@@ -70,7 +70,7 @@ Game.prototype = {
     this.game.time.events.loop(Phaser.Timer.SECOND * 2, this.releaseEnemies, this);
     this.game.time.events.loop(Phaser.Timer.SECOND * 3, this.releaseZombies, this);
     this.game.time.events.loop(Phaser.Timer.SECOND * 1.8, this.releaseBlock, this);
-    this.game.time.events.loop(Phaser.Timer.SECOND * 4, this.releaseBurger, this);
+    this.game.time.events.loop(Phaser.Timer.SECOND * 8, this.releaseBurger, this);
   },
   
   update: function() {
@@ -181,7 +181,7 @@ Game.prototype = {
     if(this.player.body.touching.down) {
       this.points+= 100;
       this.refreshStats();
-      this.player.body.velocity.y -= 800;
+      this.player.body.velocity.y -= 750;
       this.jumpTrack.play();
     }    
   },
@@ -199,13 +199,11 @@ Game.prototype = {
       this.gameOverTrack.play();
       this.player.animations.play('walk');
       this.player.scale.x = -0.7;
-      this.player.body.velocity.x = -500;
+      this.player.body.velocity.x = -550;
       this.player.body.collideWorldBounds = false;
       this.ambulance = this.game.add.sprite(this.game.world.width, this.game.world.height-100, 'ambulance');
       this.ambulance.scale.setTo(5);
-      this.game.add.tween(this.ambulance).to({x: -200},1000, Phaser.Easing.Linear.None, true);
-
-
+      this.game.add.tween(this.ambulance).to({x: -200},1500, Phaser.Easing.Linear.None, true);
     
       this.game.time.events.add(2500, this.gameOver, this);
     } else {
@@ -218,15 +216,15 @@ Game.prototype = {
     enemy.checkWorldBounds = true;
     enemy.outOfBoundsKill = true;
     enemy.scale.setTo(-0.5, 0.5);
-    enemy.reset(this.game.world.width, this.game.height-240);
-    enemy.body.velocity.x = this.game.rnd.integerInRange(-900, -450);
+    enemy.reset(this.game.world.width, this.game.height-280);
+    enemy.body.velocity.x = this.game.rnd.integerInRange(-800, -350);
   },
  
   generateEnemies: function() {
     this.enemies = this.game.add.group();
     this.enemies.enableBody = true;
     this.enemies.physicsBodyType = Phaser.Physics.ARCADE;
-    this.enemies.createMultiple(40, 'enemy');
+    this.enemies.createMultiple(1000, 'enemy');
     this.enemies.setAll('anchor.x', 0.5);
     this.enemies.setAll('anchor.y', 0.5);
     this.enemies.callAll('body.setSize', 'body', 45, 50, 0, 0);
@@ -239,7 +237,7 @@ Game.prototype = {
     zombie.outOfBoundsKill = true;
     zombie.scale.setTo(1.2);
     zombie.reset(this.game.world.width, this.game.height-50);
-    zombie.body.velocity.x = this.game.rnd.integerInRange(-300, -150);
+    zombie.body.velocity.x = this.game.rnd.integerInRange(-400, -150);
     var zwalk = zombie.animations.add('zwalk', [3, 4], 10, true);
     zombie.animations.play('zwalk');
   },
@@ -263,13 +261,14 @@ Game.prototype = {
     block.scale.setTo(1);
     block.reset(this.game.world.width, this.game.height-130);
     block.body.velocity.x = this.game.rnd.integerInRange(-300, -200);
+    //block.body.height.y = this.game.rnd.integerInRange(-170);
   },
 
   generateBlock: function() {
     this.blocks = this.game.add.group();
     this.blocks.enableBody = true;
     this.blocks.physicsBodyType = Phaser.Physics.ARCADE
-    this.blocks.createMultiple(30, 'block');
+    this.blocks.createMultiple(1000, 'block');
     this.blocks.setAll('anchor.x', 0.5);
     this.blocks.setAll('anchor.y', 0.5);
     this.blocks.callAll('body.setSize', 'body', 96, 33, 0, 0);
@@ -281,7 +280,7 @@ Game.prototype = {
     burger.outOfBoundsKill = true;
     burger.body.immovable = true;
     burger.scale.setTo(1);
-    burger.reset(0, this.game.height-290);
+    burger.reset(0, this.game.height-340);
     burger.body.velocity.x = this.game.rnd.integerInRange(200, 100);
   },
 
@@ -289,7 +288,7 @@ Game.prototype = {
     this.burgers = this.game.add.group();
     this.burgers.enableBody = true;
     this.burgers.physicsBodyType = Phaser.Physics.ARCADE
-    this.burgers.createMultiple(50, 'burger');
+    this.burgers.createMultiple(1000, 'burger');
     this.burgers.setAll('anchor.x', 0.5);
     this.burgers.setAll('anchor.y', 0.5);
     this.burgers.callAll('body.setSize', 'body', 32, 32, 0, 0);
@@ -301,7 +300,7 @@ Game.prototype = {
          // }
          // for (var i = 0; i < this.zombies.children.length; i++) {
          //  this.game.debug.body(this.zombies.children[i]);
-         }
+         //}
         // this.game.debug.body(this.player);   
     }
-};
+  };
